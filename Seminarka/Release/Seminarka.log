@@ -1,0 +1,55 @@
+﻿Build started 15/02/2017 00:02:46.
+     1>Project "C:\Users\pyszk\OneDrive\Dokumenty\seminarka\Seminarka\Seminarka\Seminarka.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\OpenCV\build\include /I\..\..\include /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D _CRT_SECURE_NO_WARNINGS /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yc"stdafx.h" /Fp"Release\Seminarka.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\NeuralResult.h(178): warning C4244: '=' : conversion from 'const float' to 'int', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSkt.h(62): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSkt.h(63): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSkt.h(173): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSkt.h(174): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSkt.h(183): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSkt.h(184): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DepthMapSktBinFileIO.h(6): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\Video.h(91): warning C4930: 'cv::VideoCapture in_capture(void)': prototyped function not called (was a variable definition intended?)
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\CFRepresentation.h(24): warning C4244: 'return' : conversion from 'int' to 'float', possible loss of data
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\CFRepresentation.h(40): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DTWanalyzer.h(38): warning C4101: 'distance' : unreferenced local variable
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DTWanalyzer.h(118): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\users\pyszk\onedrive\dokumenty\seminarka\seminarka\seminarka\DTWanalyzer.h(111): warning C4101: 'distance' : unreferenced local variable
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\OpenCV\build\include /I\..\..\include /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D _CRT_SECURE_NO_WARNINGS /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\Seminarka.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt BodyPart.cpp CVNeural.cpp DataLoader.cpp Joint.cpp Skeleton.cpp VideoManager.cpp main.cpp
+         BodyPart.cpp
+         CVNeural.cpp
+     1>CVNeural.cpp(55): warning C4018: '<' : signed/unsigned mismatch
+         DataLoader.cpp
+     1>DataLoader.cpp(25): warning C4018: '<' : signed/unsigned mismatch
+     1>DataLoader.cpp(73): warning C4018: '<' : signed/unsigned mismatch
+     1>DataLoader.cpp(167): warning C4018: '<' : signed/unsigned mismatch
+         Joint.cpp
+     1>Joint.cpp(15): warning C4244: 'argument' : conversion from 'const float' to 'int', possible loss of data
+         Skeleton.cpp
+         VideoManager.cpp
+     1>VideoManager.cpp(60): warning C4244: '=' : conversion from 'float' to 'uchar', possible loss of data
+     1>VideoManager.cpp(76): warning C4018: '<' : signed/unsigned mismatch
+     1>VideoManager.cpp(174): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>VideoManager.cpp(183): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>VideoManager.cpp(187): warning C4018: '<' : signed/unsigned mismatch
+         main.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\pyszk\OneDrive\Dokumenty\seminarka\Seminarka\Release\Seminarka.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\OpenCV\build\x86\vc12\lib opencv_calib3d2413.lib opencv_contrib2413.lib opencv_features2d2413.lib opencv_flann2413.lib opencv_gpu2413.lib opencv_imgproc2413.lib opencv_legacy2413.lib opencv_ml2413.lib opencv_nonfree2413.lib opencv_objdetect2413.lib opencv_ocl2413.lib opencv_photo2413.lib opencv_stitching2413.lib opencv_superres2413.lib opencv_video2413.lib opencv_videostab2413.lib opencv_ts2413.lib opencv_core2413.lib opencv_highgui2413.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\pyszk\OneDrive\Dokumenty\seminarka\Seminarka\Release\Seminarka.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\pyszk\OneDrive\Dokumenty\seminarka\Seminarka\Release\Seminarka.lib" /MACHINE:X86 /SAFESEH Release\BodyPart.obj
+         Release\CVNeural.obj
+         Release\DataLoader.obj
+         Release\VideoManager.obj
+         Release\Joint.obj
+         Release\main.obj
+         Release\Skeleton.obj
+         Release\stdafx.obj
+     1>LINK : warning LNK4075: ignoring '/INCREMENTAL' due to '/LTCG' specification
+         Generating code
+         Finished generating code
+         Seminarka.vcxproj -> C:\Users\pyszk\OneDrive\Dokumenty\seminarka\Seminarka\Release\Seminarka.exe
+     1>Done Building Project "C:\Users\pyszk\OneDrive\Dokumenty\seminarka\Seminarka\Seminarka\Seminarka.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:05.38
