@@ -90,7 +90,7 @@ void CVNeural::test(vector<Action*> actions) const
 {
 	cout << "Neural test START" << endl;
 
-	cv::Mat test_data = cv::Mat::zeros(0, inputLayerCount, CV_32FC1);						// 0 rows - 136(pocet uhlu) columns
+	cv::Mat test_data = cv::Mat::zeros(0, inputLayerCount, CV_32FC1);			// 0 rows - 136(pocet uhlu) columns
 	cv::Mat test_classifications = cv::Mat(0, outputLayerCount, CV_32FC1);		// 0 rows - pocet akci columns - format (0,0,0,1,0,0,0)
 
 	cout << "Neural preparing data" << endl;
@@ -127,7 +127,7 @@ void CVNeural::testNeural(Action * action, cv::Mat testData, cv::Mat testClassif
 	NeuralResult* neuralResult = new NeuralResult();
 	VideoManager* videoManager = new VideoManager();
 
-	for (int row = 0; row < testData.rows; row++)
+	for (auto row = 0; row < testData.rows; row++)
 	{
 		cvGetRow(&testDataCvMat, &testSample, row);
 
@@ -169,7 +169,7 @@ void CVNeural::storeNeuralToFile() const
 	neuralNetwork->write(*fs, "mlp");
 }
 
-void CVNeural::loadTrained() const
+void CVNeural::loadTrainedFromFile() const
 {
 	neuralNetwork->load("mlp.yml", "mlp");
 }

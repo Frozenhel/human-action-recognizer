@@ -21,7 +21,7 @@ private:
 public:
 	CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount);
 	void train(vector<Action*> actions);
-	void loadTrained() const;
+	void loadTrainedFromFile() const;
 	void test(vector<Action*> actions) const;
 	void renderedTest(Action * action) const;
 };

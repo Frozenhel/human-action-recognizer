@@ -9,14 +9,14 @@ DataLoader * dataLoader;
 int main(int argc, char* argv[])
 {
 	dataLoader = new DataLoader();
-	vector<int> actions = { 1, 3, 5, 7 , 8};;
+	vector<int> actions = { 1, 3, 5, 7, 8};;
 	const int samples = 9;
 	vector<Action*> trainActions = dataLoader->loadDailyActivityDataset(actions, samples);
 	
 	neural = new CVNeural(NOFP, 50, actions.size());
 
 	//neural->train(trainActions);
-	neural->loadTrained();
+	neural->loadTrainedFromFile();
 
 	Action * testAction = dataLoader->loadDailyActivitySampleWithVideo(8, 10);
 	neural->renderedTest(testAction);
