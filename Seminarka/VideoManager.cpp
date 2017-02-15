@@ -1,11 +1,13 @@
 ﻿#include "stdafx.h"
 #include "VideoManager.h"
+#include "TrackbarData.h"
 
 using namespace std;
 
 VideoManager::VideoManager()
 {
 	windowsInitialized = false;
+	videoStoped = false;
 }
 
 vector<cv::Mat>* VideoManager::loadVideo(string fileName)
@@ -176,6 +178,40 @@ void showFrame(Action* action, NeuralResult* neuralResult, int frame, vector<cv:
 	showNeuralOutput(neuralResult, frame,colors);
 }
 
+void onTrackbar(int frame, void* data)
+{
+	TrackbarData *trackbarData = static_cast<TrackbarData*>(data);
+	trackbarData->stopVideo();
+
+	cout << "value " << frame << endl;
+	if (frame == trackbarData->getMaxFrames())
+	{
+		cout << frame << " Video Resumed " << trackbarData->getMaxFrames() << endl;
+		trackbarData->resumeVideo();
+	}
+
+	Action *action = trackbarData->getAction();
+	showRGB(action, frame);
+	showDepth(action, frame);
+	showRGBSkeleton(action, frame);
+	showDepthSkeleton(action, frame);
+
+	showNeuralOutput(trackbarData->getNeuralResult(), frame, trackbarData->getColors());
+
+	while (trackbarData->isVideoStopped())
+	{
+		cv::waitKey(15);
+	}
+	//	actionShowFrame(action, neuralResult, frame);
+}
+
+
+void updateTrackbar(TrackbarData * trackbarData, Action * action, NeuralResult* neuralResult, int maxFrames)
+{
+	trackbarData->update(action, neuralResult, maxFrames);
+	cv::createTrackbar("", "Neural result", &maxFrames, maxFrames, onTrackbar, trackbarData);
+}
+
 void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, int frame)
 {
 	if (!windowsInitialized){
@@ -183,17 +219,14 @@ void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, i
 
 		generateColors(colors, neuralResult->getAvgResultMat().cols);
 		colors.at(0) = cv::Scalar(255, 255, 255);
-	}
 
+		trackbarData = new TrackbarData(action, neuralResult, colors, frame, false);
+	}
+	
 	showFrame(action, neuralResult, frame, colors);
+	updateTrackbar(trackbarData, action, neuralResult, frame);
 
 	cv::waitKey(200);
-}
-
-void VideoManager::onTrackbar(int value, void* data)
-{
-	cout << "value "  <<  value << endl;	
-	//	actionShowFrame(action, neuralResult, frame);
 }
 
 void VideoManager::setUpWindows(int frames)

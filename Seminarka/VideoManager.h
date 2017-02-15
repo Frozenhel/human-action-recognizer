@@ -1,13 +1,15 @@
 ﻿#pragma once
+#include "TrackbarData.h"
 
 class VideoManager
 {
 private:
+	bool videoStoped;
 	bool windowsInitialized;
 	vector<cv::Scalar> colors;
+	TrackbarData* trackbarData;
 
 	void setUpWindows(int frames);
-	static void onTrackbar(int value, void* data);
 public:
 	VideoManager();
 	void actionShowFrame(Action * action, NeuralResult* neuralResult, int frame);

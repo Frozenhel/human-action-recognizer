@@ -87,6 +87,9 @@
     <ClInclude Include="VideoManager.h">
       <Filter>Header Files\managers</Filter>
     </ClInclude>
+    <ClInclude Include="TrackbarData.h">
+      <Filter>Header Files\entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

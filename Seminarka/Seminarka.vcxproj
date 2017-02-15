@@ -96,6 +96,7 @@
     <ClInclude Include="DataLoader.h" />
     <ClInclude Include="DepthMapSkt.h" />
     <ClInclude Include="DepthMapSktBinFileIO.h" />
+    <ClInclude Include="TrackbarData.h" />
     <ClInclude Include="VideoManager.h" />
     <ClInclude Include="DTWanalyzer.h" />
     <ClInclude Include="Joint.h" />
