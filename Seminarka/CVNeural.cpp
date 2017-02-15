@@ -1,13 +1,18 @@
 #include "stdafx.h"
 
-CVNeural::CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount)
+CVNeural::CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount, RecognizeMethod recognize_method)
 {
 	trainParams = CvANN_MLP_TrainParams();
 	neuralNetwork = new CvANN_MLP();
 
-	inputLayerCount = inputNeuronsCount;
-	hiddenLayerCount = hiddenNeuronsCount; 
-	outputLayerCount = outputNeuronsCount;
+	this->recognizeMethod = recognize_method;
+
+	this->inputLayerCount = inputNeuronsCount;
+	this->hiddenLayerCount = hiddenNeuronsCount;
+	this->outputLayerCount = outputNeuronsCount;
+
+	if (recognizeMethod == neuralMultiSkeleton)
+		inputLayerCount *= 4;
 }
 
 void CVNeural::train(vector<Action*> actions)
@@ -66,10 +71,23 @@ void CVNeural::prepareSingleActionData(int numOfFrames, int numOfFramesSkipWindo
 		cv::Mat dataRow = cv::Mat::zeros(1, inputLayerCount, CV_32FC1);
 		cv::Mat classificationRow = cv::Mat::zeros(1, outputLayerCount, CV_32FC1);
 
-		for (int angleId = 0; angleId < NOFP; angleId++)
+		switch (recognizeMethod)
 		{
-			dataRow.at<float>(0, angleId) = action->getAnglesMatrix().at<float>(j, angleId) - action->getAnglesMatrix().at<float>(j + numOfFrames, angleId);
-
+		case neuralDiff:
+			for (auto angleId = 0; angleId < inputLayerCount; angleId++)
+			{
+				dataRow.at<float>(0, angleId) = action->getAnglesMatrix().at<float>(j, angleId) - action->getAnglesMatrix().at<float>(j + numOfFrames, angleId);
+			}
+			break;
+		case neuralMultiSkeleton:
+			auto frameShift = 0;
+			for (auto skeletonValue = 0; skeletonValue < inputLayerCount; skeletonValue++)
+			{
+				frameShift = skeletonValue / NOFP * 5;
+				dataRow.at<float>(0, skeletonValue) = action->getAnglesMatrix().at<float>(j + frameShift, skeletonValue % NOFP);
+			}
+			break;
+			
 		}
 		actionData->push_back(dataRow);
 
@@ -133,34 +151,19 @@ void CVNeural::testNeural(Action * action, cv::Mat testData, cv::Mat testClassif
 
 		neuralNetwork->predict(&testSample, classificationResult);
 
-		//showNeuralOutput(classificationResult);
-
 		storeResults(neuralResult,classificationResult, testClassification, row);
 
 		if (showVideo)
 			videoManager->actionShowFrame(action, neuralResult, row);
 	}
+	videoManager->closeAllWindows();
 
 	neuralResult->printResults();
-}
-
-void CVNeural::showNeuralOutput(CvMat * neuralOutput) const
-{
-	cv::Mat resultMat = cv::cvarrToMat(neuralOutput);;
-	for (int i = 0; i < neuralOutput->cols; i++)
-	{
-		cout << resultMat.at<float>(0, i) << "\t";
-		if (i == neuralOutput->cols - 1)
-		{
-			cout << endl;
-		}
-	}
 }
 
 void CVNeural::storeResults(NeuralResult * neuralResult, CvMat * classificationResult, cv::Mat classificator, int row) const
 {
 	neuralResult->storeResultRow(classificationResult, classificator, row);	
-	printf("Testing Sample %i -> result AVG: %d, result nonAVG: %d \n", row, neuralResult->getLastAvgResult(), neuralResult->getLastResult());
 }
 
 void CVNeural::storeNeuralToFile() const

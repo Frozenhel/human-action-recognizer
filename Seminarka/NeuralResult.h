@@ -175,6 +175,8 @@ inline void NeuralResult::storeResultRow(CvMat * resultRow, cv::Mat classificato
 	avgResultMat.push_back(createAvgResultRow(resultMat));
 
 	checkResult(classificator, row);
+
+	printf("Testing Sample %i -> result AVG: %d, result nonAVG: %d \n", row, getLastAvgResult(), getLastResult());
 }
 
 inline cv::Mat NeuralResult::getResultMat() const
@@ -189,7 +191,7 @@ inline cv::Mat NeuralResult::getAvgResultMat() const
 
 inline int NeuralResult::getLastResult() const
 {
-	auto max = 0;
+	float max = 0;
 	auto pos = 0;
 
 	for (auto i = 0; i < resultMat.cols; i++)
@@ -206,7 +208,7 @@ inline int NeuralResult::getLastResult() const
 inline int NeuralResult::getLastAvgResult() const
 {
 	float max = 0;
-	int pos = 0;
+	auto pos = 0;
 
 	for (auto i = 0; i < avgResultMat.cols; i++)
 	{

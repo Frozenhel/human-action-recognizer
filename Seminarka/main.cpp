@@ -1,6 +1,9 @@
 #include "stdafx.h"
+#include "RecognizeMethod.h"
 
 using namespace std;
+
+const RecognizeMethod method = neuralMultiSkeleton;
 
 CFRepresentation * cf;
 CVNeural * neural;
@@ -12,15 +15,28 @@ int main(int argc, char* argv[])
 	vector<int> actions = { 1, 3, 5, 7, 8};;
 	const int samples = 9;
 	vector<Action*> trainActions = dataLoader->loadDailyActivityDataset(actions, samples);
-	
-	neural = new CVNeural(NOFP, 50, actions.size());
 
-	//neural->train(trainActions);
+	neural = new CVNeural(NOFP, 50, actions.size(), method);
+	//	neural->train(trainActions);
 	neural->loadTrainedFromFile();
 
-	Action * testAction = dataLoader->loadDailyActivitySampleWithVideo(8, 10);
+	//DEMO :)
+	/*auto testAction = dataLoader->loadDailyActivitySampleWithVideo(1, 10);
 	neural->renderedTest(testAction);
-	//neural->test(trainActions);
+
+	testAction = dataLoader->loadDailyActivitySampleWithVideo(3, 5);
+	neural->renderedTest(testAction);
+
+	testAction = dataLoader->loadDailyActivitySampleWithVideo(5, 5);
+	neural->renderedTest(testAction);
+
+	testAction = dataLoader->loadDailyActivitySampleWithVideo(7, 10);
+	neural->renderedTest(testAction);
+
+	testAction = dataLoader->loadDailyActivitySampleWithVideo(8, 10);
+	neural->renderedTest(testAction);*/
+	
+	neural->test(trainActions);
 
 	cv::waitKey(0);
 

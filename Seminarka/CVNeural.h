@@ -1,8 +1,11 @@
 #pragma once
+#include "RecognizeMethod.h"
 
 class CVNeural
 {
 private:
+	RecognizeMethod recognizeMethod;
+
 	int inputLayerCount;
 	int hiddenLayerCount;
 	int outputLayerCount;
@@ -19,7 +22,7 @@ private:
 	void storeNeuralToFile() const;
 
 public:
-	CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount);
+	CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount, RecognizeMethod recognize_method);
 	void train(vector<Action*> actions);
 	void loadTrainedFromFile() const;
 	void test(vector<Action*> actions) const;

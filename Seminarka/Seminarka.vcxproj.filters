@@ -37,6 +37,9 @@
     <Filter Include="Source Files\neurals">
       <UniqueIdentifier>{2044c298-bf90-4b4a-9e13-ac4b5e234f65}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\enums">
+      <UniqueIdentifier>{381e51b5-fd15-415e-a47a-1dc09fa4d655}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -89,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="TrackbarData.h">
       <Filter>Header Files\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="RecognizeMethod.h">
+      <Filter>Header Files\enums</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

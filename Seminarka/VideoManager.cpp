@@ -84,6 +84,11 @@ void VideoManager::actionPlay(Action* action)
 	}
 }
 
+void VideoManager::closeAllWindows() const
+{
+	cv::destroyAllWindows();
+}
+
 void showRGB(Action * action, int frame)
 {
 	cv::Mat resizedMat;
@@ -273,7 +278,7 @@ void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, i
 	showFrame(action, neuralResult, frame, colors);
 	updateTrackbar(trackbarData, action, neuralResult, frame);
 
-	cv::waitKey(200);
+	cv::waitKey(60);
 }
 
 void VideoManager::setUpWindows(int frames)
