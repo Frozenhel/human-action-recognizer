@@ -71,7 +71,7 @@ void VideoManager::actionPlay(Action* action)
 	auto videoDepth = action->getDepthMap();
 	auto skeletons = action->getSkeletons();
 
-	setUpWindows();
+	setUpWindows(action->getAnglesMatrix().rows);
 
 	for (auto frame = 0; frame < videoRGB->size(); frame++)
 	{
@@ -80,27 +80,6 @@ void VideoManager::actionPlay(Action* action)
 
 		cvWaitKey(0);
 	}
-}
-
-void VideoManager::setUpWindows()
-{
-	cv::namedWindow("Video RGB", CV_WINDOW_AUTOSIZE);
-	cv::namedWindow("Video Depth", CV_WINDOW_AUTOSIZE);
-	cv::namedWindow("Video RGB+skeleton", CV_WINDOW_AUTOSIZE);
-	cv::namedWindow("Video Depth+skeleton", CV_WINDOW_AUTOSIZE);
-	cv::namedWindow("Neural result", CV_WINDOW_AUTOSIZE);
-
-	cv::resizeWindow("Video RGB", 300, 300);
-	cv::resizeWindow("Video Depth", 300, 300);
-	cv::resizeWindow("Video RGB+skeleton", 300, 300);
-	cv::resizeWindow("Video Depth+skeleton", 300, 300);
-	cv::resizeWindow("Neural result", 700, 300);
-
-	cv::moveWindow("Video RGB", 0, 50);
-	cv::moveWindow("Video Depth", 350, 50);
-	cv::moveWindow("Video RGB+skeleton", 700, 50);
-	cv::moveWindow("Video Depth+skeleton", 1050, 50);
-	cv::moveWindow("Neural result", 350, 500);
 }
 
 void showRGB(Action * action, int frame)
@@ -157,14 +136,10 @@ void showDepthSkeleton(Action * action, int frame)
 	cv::imshow("Video Depth+skeleton", resizedMat);
 }
 
-void VideoManager::showNeuralOutput(NeuralResult * neuralResult, int frame)
+void showNeuralOutput(NeuralResult * neuralResult, int frame, vector<cv::Scalar> colors)
 {
 	cv::Mat displayMat = cv::Mat::ones(300, 700, CV_8UC3);
 	cv::Mat resultMat = neuralResult->getAvgResultMat();
-	
-	if (frame == 0)
-		generateColors(colors, neuralResult->getAvgResultMat().cols);
-	colors.at(0) = cv::Scalar(255, 255, 255);
 
 	if (resultMat.rows <= 35)
 	{
@@ -192,17 +167,57 @@ void VideoManager::showNeuralOutput(NeuralResult * neuralResult, int frame)
 	imshow("Neural result", displayMat);
 }
 
-void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, int frame)
+void showFrame(Action* action, NeuralResult* neuralResult, int frame, vector<cv::Scalar> colors)
 {
-	if (!windowsInitialized)
-		setUpWindows();
-
 	showRGB(action, frame);
 	showDepth(action, frame);
 	showRGBSkeleton(action, frame);
 	showDepthSkeleton(action, frame);
-	showNeuralOutput(neuralResult, frame);
+	showNeuralOutput(neuralResult, frame,colors);
+}
+
+void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, int frame)
+{
+	if (!windowsInitialized){
+		setUpWindows(action->getAnglesMatrix().rows);
+
+		generateColors(colors, neuralResult->getAvgResultMat().cols);
+		colors.at(0) = cv::Scalar(255, 255, 255);
+	}
+
+	showFrame(action, neuralResult, frame, colors);
 
 	cv::waitKey(200);
+}
+
+void VideoManager::onTrackbar(int value, void* data)
+{
+	cout << "value "  <<  value << endl;	
+	//	actionShowFrame(action, neuralResult, frame);
+}
+
+void VideoManager::setUpWindows(int frames)
+{
+	cv::namedWindow("Video RGB", CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("Video Depth", CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("Video RGB+skeleton", CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("Video Depth+skeleton", CV_WINDOW_AUTOSIZE);
+	cv::namedWindow("Neural result", CV_WINDOW_AUTOSIZE);
+
+	cv::resizeWindow("Video RGB", 300, 300);
+	cv::resizeWindow("Video Depth", 300, 300);
+	cv::resizeWindow("Video RGB+skeleton", 300, 300);
+	cv::resizeWindow("Video Depth+skeleton", 300, 300);
+	cv::resizeWindow("Neural result", 700, 300);
+
+	cv::moveWindow("Video RGB", 0, 50);
+	cv::moveWindow("Video Depth", 350, 50);
+	cv::moveWindow("Video RGB+skeleton", 700, 50);
+	cv::moveWindow("Video Depth+skeleton", 1050, 50);
+	cv::moveWindow("Neural result", 350, 500);
+
+	cv::createTrackbar("", "Neural result", 0, frames, onTrackbar);
+
+	windowsInitialized = true;
 }
 
