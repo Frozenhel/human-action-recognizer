@@ -26,6 +26,7 @@ public:
 	float getCorrectPercentages() const;
 	float getWrongPercentages() const;
 	void printResults() const;
+	void printNeuralValuesAtFrame(int frame) const;
 	void storeResultRow(CvMat * resultRow, cv::Mat classificator, int row);
 
 	cv::Mat getResultMat() const;
@@ -85,6 +86,26 @@ inline void NeuralResult::printResults() const
 
 	cout << "Correct avg answers: " << correctAvg << "/" << getNumOfResults() << endl;
 	cout << "Wrong avg answers: " << wrongAvg << "/" << getNumOfResults() << endl;
+}
+
+inline void NeuralResult::printNeuralValuesAtFrame(int frame) const
+{
+	cout << endl;
+	cout << "Neural results at frame " << frame << endl;
+
+	cout << "Neural output" << endl;
+	for (auto i = 0; i < resultMat.cols; i++)
+	{
+		cout << resultMat.at<float>(frame, i) << "\t";
+	}
+	cout << endl;
+
+	cout << "Avg results" << endl;
+	for (auto i = 0; i < avgResultMat.cols; i++)
+	{
+		cout << avgResultMat.at<float>(frame, i) << "\t";
+	}
+	cout << endl;
 }
 
 inline cv::Mat createAvgResultRow(cv::Mat resultMat)

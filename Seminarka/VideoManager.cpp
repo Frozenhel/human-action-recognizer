@@ -138,34 +138,82 @@ void showDepthSkeleton(Action * action, int frame)
 	cv::imshow("Video Depth+skeleton", resizedMat);
 }
 
-void showNeuralOutput(NeuralResult * neuralResult, int frame, vector<cv::Scalar> colors)
+int setBegining(int row)
 {
-	cv::Mat displayMat = cv::Mat::ones(300, 700, CV_8UC3);
-	cv::Mat resultMat = neuralResult->getAvgResultMat();
+	if (row <= 36) 
+		return 0;
+	return row - 36;
+}
 
-	if (resultMat.rows <= 35)
+void drawNeuralResultLines(cv::Mat displayMat, cv::Mat resultMat, int begining, vector<cv::Scalar> colors)
+{
+	for (auto i = 1; i < resultMat.rows; i++)
 	{
-		for (auto i = 1; i < resultMat.rows; i++)
+		for (auto action = 0; action < resultMat.cols; action++)
+			line(displayMat, cv::Point((i - 1 - begining) * 20, 299 - resultMat.at<float>(i - 1, action) * 299), cv::Point((i - begining) * 20, 299 - resultMat.at<float>(i, action) * 299), colors.at(action), 2);
+	}
+}
+
+void currentNeuralLine(cv::Mat displayMat, int frame)
+{
+	line(displayMat, cv::Point(frame * 20, 0), cv::Point(frame * 20, 299), cv::Scalar(0, 255, 255), 1);
+
+}
+
+void drawCurrentLine(cv::Mat displayMat, cv::Mat resultMat, int frame, int * begining)
+{
+	if (frame + 1 != resultMat.rows)
+	{
+		if (*begining == 0)
 		{
-			for (auto action = 0; action < resultMat.cols; action++)
-				line(displayMat, cv::Point((i - 1) * 20, 299 - resultMat.at<float>(i - 1, action) * 299), cv::Point((i)* 20, 299 - resultMat.at<float>(i, action) * 299), colors.at(action), 2);
+			currentNeuralLine(displayMat, frame);
+		}
+		else
+		{
+			if (frame < 20)
+			{
+				currentNeuralLine(displayMat, frame);
+				*begining = 0;
+			}
+			else if (frame > resultMat.rows - 16)
+			{
+				currentNeuralLine(displayMat, 36 - (resultMat.rows - frame));
+			}
+			else
+			{
+				currentNeuralLine(displayMat, 20);
+				*begining = frame - 20;
+			}
 		}
 	}
 	else
 	{
-		auto begining = resultMat.rows - 35;
-		for (auto i = begining; i < resultMat.rows; i++)
-		{
-			for (auto action = 0; action < resultMat.cols; action++)
-				line(displayMat, cv::Point((i - 1 - begining) * 20, 299 - resultMat.at<float>(i - 1, action) * 299), cv::Point((i - begining) * 20, 299 - resultMat.at<float>(i, action) * 299), colors.at(action), 2);
-		}
+		currentNeuralLine(displayMat, resultMat.rows - 1 - *begining);
 	}
+}
 
-	for (int i = 0; i < colors.size(); i++)
+void drawNeuralResultGraph(cv::Mat displayMat, cv::Mat resultMat, vector<cv::Scalar> colors, int frame)
+{
+	int begining = setBegining(resultMat.rows);
+	drawCurrentLine(displayMat, resultMat, frame, &begining);
+	drawNeuralResultLines(displayMat, resultMat, begining, colors);
+}
+
+void drawLegend(cv::Mat displayMat, vector<cv::Scalar> colors)
+{
+	for (auto i = 0; i < colors.size(); i++)
 	{
-		putText(displayMat,to_string(i), cv::Point(5,i*20+10),CV_FONT_HERSHEY_SIMPLEX,0.5,colors.at(i),2);
+		putText(displayMat, to_string(i), cv::Point(5, i * 20 + 10), CV_FONT_HERSHEY_SIMPLEX, 0.5, colors.at(i), 2);
 	}
+}
+
+void showNeuralOutput(NeuralResult * neuralResult, int frame, vector<cv::Scalar> colors)
+{
+	cv::Mat displayMat = cv::Mat::ones(300, 701, CV_8UC3);
+	cv::Mat resultMat = neuralResult->getAvgResultMat();
 	
+	drawNeuralResultGraph(displayMat, resultMat, colors, frame);
+	drawLegend(displayMat, colors);
 	imshow("Neural result", displayMat);
 }
 
@@ -180,22 +228,21 @@ void showFrame(Action* action, NeuralResult* neuralResult, int frame, vector<cv:
 
 void onTrackbar(int frame, void* data)
 {
-	TrackbarData *trackbarData = static_cast<TrackbarData*>(data);
+	auto trackbarData = static_cast<TrackbarData*>(data);
 	trackbarData->stopVideo();
 
-	cout << "value " << frame << endl;
 	if (frame == trackbarData->getMaxFrames())
 	{
 		cout << frame << " Video Resumed " << trackbarData->getMaxFrames() << endl;
 		trackbarData->resumeVideo();
 	}
 
-	Action *action = trackbarData->getAction();
-	showRGB(action, frame);
-	showDepth(action, frame);
-	showRGBSkeleton(action, frame);
-	showDepthSkeleton(action, frame);
+	trackbarData->getNeuralResult()->printNeuralValuesAtFrame(frame);
 
+	showRGB(trackbarData->getAction() , frame);
+	showDepth(trackbarData->getAction() , frame);
+	showRGBSkeleton(trackbarData->getAction() , frame);
+	showDepthSkeleton(trackbarData->getAction() , frame);
 	showNeuralOutput(trackbarData->getNeuralResult(), frame, trackbarData->getColors());
 
 	while (trackbarData->isVideoStopped())
@@ -209,7 +256,7 @@ void onTrackbar(int frame, void* data)
 void updateTrackbar(TrackbarData * trackbarData, Action * action, NeuralResult* neuralResult, int maxFrames)
 {
 	trackbarData->update(action, neuralResult, maxFrames);
-	cv::createTrackbar("", "Neural result", &maxFrames, maxFrames, onTrackbar, trackbarData);
+	cv::createTrackbar("Control", "Neural result", &maxFrames, maxFrames, onTrackbar, trackbarData);
 }
 
 void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, int frame)
@@ -249,7 +296,7 @@ void VideoManager::setUpWindows(int frames)
 	cv::moveWindow("Video Depth+skeleton", 1050, 50);
 	cv::moveWindow("Neural result", 350, 500);
 
-	cv::createTrackbar("", "Neural result", 0, frames, onTrackbar);
+//	cv::createTrackbar("", "Neural result", 0, frames, onTrackbar);
 
 	windowsInitialized = true;
 }

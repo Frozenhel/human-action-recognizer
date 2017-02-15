@@ -1,13 +1,12 @@
-﻿Build started 15/02/2017 11:09:24.
+﻿Build started 15/02/2017 21:07:40.
      1>Project "D:\humanActionRecognition\human-action-recognizer\Seminarka\Seminarka.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /IC:\OpenCV\build\include /I\..\..\include /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D _CRT_SECURE_NO_WARNINGS /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Release\Seminarka.pch" /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt VideoManager.cpp
          VideoManager.cpp
      1>VideoManager.cpp(62): warning C4244: '=' : conversion from 'float' to 'uchar', possible loss of data
      1>VideoManager.cpp(78): warning C4018: '<' : signed/unsigned mismatch
-     1>VideoManager.cpp(151): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>VideoManager.cpp(160): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-     1>VideoManager.cpp(164): warning C4018: '<' : signed/unsigned mismatch
+     1>VideoManager.cpp(153): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
+     1>VideoManager.cpp(204): warning C4018: '<' : signed/unsigned mismatch
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\humanActionRecognition\human-action-recognizer\Release\Seminarka.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\OpenCV\build\x86\vc12\lib opencv_calib3d2413.lib opencv_contrib2413.lib opencv_features2d2413.lib opencv_flann2413.lib opencv_gpu2413.lib opencv_imgproc2413.lib opencv_legacy2413.lib opencv_ml2413.lib opencv_nonfree2413.lib opencv_objdetect2413.lib opencv_ocl2413.lib opencv_photo2413.lib opencv_stitching2413.lib opencv_superres2413.lib opencv_video2413.lib opencv_videostab2413.lib opencv_ts2413.lib opencv_core2413.lib opencv_highgui2413.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\humanActionRecognition\human-action-recognizer\Release\Seminarka.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\humanActionRecognition\human-action-recognizer\Release\Seminarka.lib" /MACHINE:X86 /SAFESEH Release\BodyPart.obj
          Release\CVNeural.obj
@@ -25,4 +24,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:02.67
+Time Elapsed 00:00:02.26
