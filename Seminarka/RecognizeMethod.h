@@ -3,5 +3,6 @@
 enum RecognizeMethod
 {
 	neuralDiff,
-	neuralMultiSkeleton
+	neuralMultiSkeleton,
+	DTW
 };
