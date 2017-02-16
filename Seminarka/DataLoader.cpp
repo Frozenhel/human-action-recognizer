@@ -11,51 +11,45 @@ string DataLoader::getFileName(int action, int human)
 	return "a" + action_str.str() + "_s" + human_str.str() + "_e02_";
 }
 
-vector<Action*> DataLoader::loadDailyActivityDataset(vector<int> listOfActions, int numOfSamples)
+void DataLoader::loadDailyActivityDataset(vector<Action*>* actions)
 {
 	cout << "Loading data" << endl;
 
-	actions = listOfActions;
-
-	auto actions = new vector<Action*>();
 	cv::Mat skeleton;
 	string path = "E:/testVideos/";
 	string fileName = "";
 
-	for (auto action = 0; action < listOfActions.size(); action++)
+	for (Action * action : *actions)
 	{
-		for (auto i = 1; i <= numOfSamples; i++)
+		fileName = getFileName(action->getActionType(), action->getSample());
+		FILE* fp = fopen((path + fileName + "depth.bin").c_str(), "rb");
+		if (fp == NULL) return;
+
+		int nofs = 0; //number of frames conatined in the file (each file is a video sequence of depth maps)
+		int ncols = 0;
+		int nrows = 0;
+		ReadDepthMapSktBinFileHeader(fp, nofs, ncols, nrows);
+		fclose(fp);
+
+		Skeleton* skeletons = new Skeleton[nofs];
+		ReadSkeletonMap(path + fileName + "skeleton.txt", skeletons, nofs);
+
+		auto singleAction = cv::Mat(nofs, NOFP, CV_32FC1, 0.0f);
+		for (auto f = 0; f < nofs; f++)
 		{
-			fileName = getFileName(listOfActions[action], i);
-			FILE* fp = fopen((path + fileName + "depth.bin").c_str(), "rb");
-			if (fp == NULL) return *actions;;
-
-			int nofs = 0; //number of frames conatined in the file (each file is a video sequence of depth maps)
-			int ncols = 0;
-			int nrows = 0;
-			ReadDepthMapSktBinFileHeader(fp, nofs, ncols, nrows);
-			fclose(fp);
-
-			Skeleton* skeletons = new Skeleton[nofs];
-			ReadSkeletonMap(path + fileName + "skeleton.txt", skeletons, nofs);
-
-			auto singleAction = cv::Mat(nofs, NOFP, CV_32FC1, 0.0f);
-			for (auto f = 0; f < nofs; f++)
+			Skeleton sk = skeletons[f];
+			sk.bodyPartsInit();
+			float* angles = sk.calculateAnglesBtwParts();
+			//** matice V
+			for (auto j = 0; j < NOFP; j++)
 			{
-				Skeleton sk = skeletons[f];
-				sk.bodyPartsInit();
-				float* angles = sk.calculateAnglesBtwParts();
-				//** matice V
-				for (auto j = 0; j < NOFP; j++)
-				{
-					singleAction.at<float>(f, j) = angles[j];
-				}
+				singleAction.at<float>(f, j) = angles[j];
 			}
-			actions->push_back(new Action(listOfActions[action], action, i, 0, singleAction));
 		}
+		action->setAnglesMatrix(singleAction);
 	}
+
 	cout << "Loaded " << actions->size() << " samples" << endl;
-	return *actions;
 }
 
 //TODO sprovoznit
@@ -107,7 +101,7 @@ vector<Action*> DataLoader::loadAction3DDataset(vector<int> listOfActions, int n
 					V.at<float>(j, f) = angles[j];
 				}
 			}
-			actions->push_back(new Action(listOfActions[action], action, i, 0, V));
+		//	actions->push_back(new Action(listOfActions[action], action, i, 0, V));
 		}
 	}
 	cout << "Loaded " << actions->size() << " samples" << endl;
@@ -115,19 +109,19 @@ vector<Action*> DataLoader::loadAction3DDataset(vector<int> listOfActions, int n
 }
 
 
-Action* DataLoader::loadDailyActivitySampleWithVideo(int action, int sample)
+void DataLoader::loadDailyActivitySampleWithVideo(Action * action)
 {
 	cout << "Loading data" << endl;
 
-	cout << "Actions vector size " << actions.size() << endl;
+	//cout << "Actions vector size " << actions.size() << endl;
 
 	cv::Mat skeleton;
 	string path = "E:/testVideos/";
 	string fileName = "";
 
-	fileName = getFileName(action, sample);
+	fileName = getFileName(action->getActionType(), action->getSample());
 	FILE* fp = fopen((path + fileName + "depth.bin").c_str(), "rb");
-	if (fp == NULL) return nullptr;
+	if (fp == NULL) return;
 
 	int nofs = 0; //number of frames conatined in the file (each file is a video sequence of depth maps)
 	int ncols = 0;
@@ -138,7 +132,7 @@ Action* DataLoader::loadDailyActivitySampleWithVideo(int action, int sample)
 	Skeleton* skeletons = new Skeleton[nofs];
 	ReadSkeletonMap(path + fileName + "skeleton.txt", skeletons, nofs);
 
-	auto singleAction = cv::Mat(nofs, NOFP, CV_32FC1, 0.0f);
+	auto anglesMatrix = cv::Mat(nofs, NOFP, CV_32FC1, 0.0f);
 	for (auto f = 0; f < nofs; f++)
 	{
 		Skeleton sk = skeletons[f];
@@ -147,29 +141,14 @@ Action* DataLoader::loadDailyActivitySampleWithVideo(int action, int sample)
 
 		for (auto j = 0; j < NOFP; j++)
 		{
-			singleAction.at<float>(f, j) = angles[j];
+			anglesMatrix.at<float>(f, j) = angles[j];
 		}
 	}
 
 	cout << "Loaded single action" << endl;
 
-	Action *actionSample = new Action(action, getActionId(action), sample, 0, singleAction);
-
-	actionSample->setVideo(VideoManager().loadVideo(path + fileName + "rgb.avi"));
-	actionSample->setDepthMap(VideoManager().loadDepthMap(path + fileName + "depth.bin"));
-	actionSample->setSkeletons(skeletons);
-
-	return actionSample;
-}
-
-int DataLoader::getActionId(int action) const
-{
-	for (int i = 0; i < actions.size(); i++)
-	{
-		if (action == actions.at(i))
-		{
-			return i;
-		}
-	}
-	return 0;
+	action->setAnglesMatrix(anglesMatrix);
+	action->setVideo(VideoManager().loadVideo(path + fileName + "rgb.avi"));
+	action->setDepthMap(VideoManager().loadDepthMap(path + fileName + "depth.bin"));
+	action->setSkeletons(skeletons);
 }

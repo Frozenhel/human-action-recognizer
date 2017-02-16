@@ -93,6 +93,7 @@
     <ClInclude Include="CFRepresentation.h" />
     <ClInclude Include="CvHMM.h" />
     <ClInclude Include="CVNeural.h" />
+    <ClInclude Include="DailyActions.h" />
     <ClInclude Include="DataLoader.h" />
     <ClInclude Include="DepthMapSkt.h" />
     <ClInclude Include="DepthMapSktBinFileIO.h" />

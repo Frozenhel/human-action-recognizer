@@ -96,6 +96,9 @@
     <ClInclude Include="RecognizeMethod.h">
       <Filter>Header Files\enums</Filter>
     </ClInclude>
+    <ClInclude Include="DailyActions.h">
+      <Filter>Header Files\enums</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

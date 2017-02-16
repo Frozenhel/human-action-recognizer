@@ -1,11 +1,14 @@
 #include "stdafx.h"
 
-CVNeural::CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount, RecognizeMethod recognize_method)
+CVNeural::CVNeural(int inputNeuronsCount, int hiddenNeuronsCount, int outputNeuronsCount, vector<DailyAction> actionList, RecognizeMethod recognize_method)
 {
 	trainParams = CvANN_MLP_TrainParams();
 	neuralNetwork = new CvANN_MLP();
 
+	completeResult = new NeuralResult();
+
 	this->recognizeMethod = recognize_method;
+	this->actionList = actionList;
 
 	this->inputLayerCount = inputNeuronsCount;
 	this->hiddenLayerCount = hiddenNeuronsCount;
@@ -104,19 +107,29 @@ void CVNeural::trainNeural(cv::Mat trainData, cv::Mat trainClassification) const
 	cout << "Training - num of iterations: " << iterations << endl;
 }
 
-void CVNeural::test(vector<Action*> actions) const
+void CVNeural::test(vector<Action*> actions)
 {
 	cout << "Neural test START" << endl;
 
-	cv::Mat test_data = cv::Mat::zeros(0, inputLayerCount, CV_32FC1);			// 0 rows - 136(pocet uhlu) columns
-	cv::Mat test_classifications = cv::Mat(0, outputLayerCount, CV_32FC1);		// 0 rows - pocet akci columns - format (0,0,0,1,0,0,0)
+	cv::Mat test_data;										// 0 rows - 136(pocet uhlu) columns
+	cv::Mat test_classifications;							// 0 rows - pocet akci columns - format (0,0,0,1,0,0,0)
 
 	cout << "Neural preparing data" << endl;
 
-	prepareDataset(15, 1, actions, &test_data, &test_classifications);
+	for (auto action : actions)
+	{
+		test_data = cv::Mat::zeros(0, inputLayerCount, CV_32FC1);
+		test_classifications = cv::Mat(0, outputLayerCount, CV_32FC1);
 
-	testNeural(actions.at(0),test_data, test_classifications, false);
+		prepareSingleActionData(15, 1, action, &test_data, &test_classifications);
 
+		testNeural(actions.at(0), test_data, test_classifications, false);
+	}
+
+	cout << "Neural sum results" << endl;
+
+	completeResult->printResults();
+	
 	cout << "Neural test END" << endl;
 }
 
@@ -143,7 +156,7 @@ void CVNeural::testNeural(Action * action, cv::Mat testData, cv::Mat testClassif
 	CvMat testDataCvMat = testData;
 	CvMat* classificationResult = cvCreateMat(1, testClassification.cols, CV_32FC1);
 	NeuralResult* neuralResult = new NeuralResult();
-	VideoManager* videoManager = new VideoManager();
+	VideoManager* videoManager = new VideoManager(actionList);
 
 	for (auto row = 0; row < testData.rows; row++)
 	{
@@ -159,6 +172,8 @@ void CVNeural::testNeural(Action * action, cv::Mat testData, cv::Mat testClassif
 	videoManager->closeAllWindows();
 
 	neuralResult->printResults();
+
+	completeResult->addValuesFromResult(neuralResult);
 }
 
 void CVNeural::storeResults(NeuralResult * neuralResult, CvMat * classificationResult, cv::Mat classificator, int row) const
@@ -176,11 +191,3 @@ void CVNeural::loadTrainedFromFile() const
 {
 	neuralNetwork->load("mlp.yml", "mlp");
 }
-
-
-
-
-
-
-
-

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "RecognizeMethod.h"
 
 using namespace std;
 
@@ -8,38 +7,48 @@ const RecognizeMethod method = neuralMultiSkeleton;
 CFRepresentation * cf;
 CVNeural * neural;
 DataLoader * dataLoader;
+
+const vector<DailyAction> actions = { eating, reading, phoning, vacuuming, celebrating };
+
+const vector<int> trainSamples = { 1, 2, 3, 4, 5, 7, 8, 9, 10 };
+const vector<int> testSamples = { 6};
+
+vector<Action*> initDataset(vector<int> samples)
+{
+	auto actionDataset = vector<Action*>();
+	for (auto i = 0; i < actions.size(); i++)
+	{
+		for (auto trainSample : samples)
+		{
+			actionDataset.push_back(new Action(actions[i], i, trainSample, 0));
+		}
+	}
+	return actionDataset;
+}
  
 int main(int argc, char* argv[])
 {
-	dataLoader = new DataLoader();
-	vector<int> actions = { 1, 3, 5, 7, 8};;
-	const int samples = 9;
-	vector<Action*> trainActions = dataLoader->loadDailyActivityDataset(actions, samples);
+	neural = new CVNeural(NOFP, 50, actions.size(), actions, method);
 
-	neural = new CVNeural(NOFP, 50, actions.size(), method);
-	//	neural->train(trainActions);
+	auto trainActions = initDataset(trainSamples);
+	auto testActions = initDataset(testSamples);
+
+	DataLoader().loadDailyActivityDataset(&trainActions);
+	DataLoader().loadDailyActivityDataset(&testActions);
+	
+	//neural->train(trainActions);
 	neural->loadTrainedFromFile();
 
-	//DEMO :)
-	/*auto testAction = dataLoader->loadDailyActivitySampleWithVideo(1, 10);
-	neural->renderedTest(testAction);
+	//neural->test(testActions);
+	for (auto action : testActions)
+	{
+		DataLoader().loadDailyActivitySampleWithVideo(action); 
+		neural->renderedTest(action);
 
-	testAction = dataLoader->loadDailyActivitySampleWithVideo(3, 5);
-	neural->renderedTest(testAction);
-
-	testAction = dataLoader->loadDailyActivitySampleWithVideo(5, 5);
-	neural->renderedTest(testAction);
-
-	testAction = dataLoader->loadDailyActivitySampleWithVideo(7, 10);
-	neural->renderedTest(testAction);
-
-	testAction = dataLoader->loadDailyActivitySampleWithVideo(8, 10);
-	neural->renderedTest(testAction);*/
-	
-	neural->test(trainActions);
+		cv::waitKey(0);
+	}	
 
 	cv::waitKey(0);
-
 	return 0;
 
 	//learning(moves, actionsCount, testRabits, &action_mats);  // cfRepresentation, move sets, num of move sets, num of humans

@@ -10,6 +10,14 @@ VideoManager::VideoManager()
 	videoStoped = false;
 }
 
+VideoManager::VideoManager(vector<DailyAction> actionList)
+{
+	windowsInitialized = false;
+	videoStoped = false;
+
+	this->actionList = actionList;
+}
+
 vector<cv::Mat>* VideoManager::loadVideo(string fileName)
 {
 	cout << "Loading RGB video" << endl;
@@ -204,31 +212,42 @@ void drawNeuralResultGraph(cv::Mat displayMat, cv::Mat resultMat, vector<cv::Sca
 	drawNeuralResultLines(displayMat, resultMat, begining, colors);
 }
 
-void drawLegend(cv::Mat displayMat, vector<cv::Scalar> colors)
+void drawLegend(cv::Mat displayMat, vector<DailyAction> actions, vector<cv::Scalar> colors)
 {
 	for (auto i = 0; i < colors.size(); i++)
 	{
-		putText(displayMat, to_string(i), cv::Point(5, i * 20 + 10), CV_FONT_HERSHEY_SIMPLEX, 0.5, colors.at(i), 2);
+		putText(displayMat, ToString(actions.at(i)), cv::Point(5, i * 20 + 10), CV_FONT_HERSHEY_SIMPLEX, 0.5, colors.at(i), 2);
 	}
 }
 
-void showNeuralOutput(NeuralResult * neuralResult, int frame, vector<cv::Scalar> colors)
+void drawLegendWithValues(cv::Mat displayMat, NeuralResult* neuralResult, int frame, vector<DailyAction> actions, vector<cv::Scalar> colors)
+{
+	
+	for (auto i = 0; i < colors.size(); i++)
+	{
+		stringstream text;
+		text << ToString(actions.at(i)) << " - AVG:" << neuralResult->getAvgResultMat().at<float>(frame, i) << "  NONAVG:" << neuralResult->getResultMat().at<float>(frame, i);
+		putText(displayMat, text.str(), cv::Point(8, i * 20 + 15), CV_FONT_HERSHEY_SIMPLEX, 0.5, colors.at(i), 2);
+	}
+}
+
+void showNeuralOutput(NeuralResult * neuralResult, int frame, vector<DailyAction> actions, vector<cv::Scalar> colors)
 {
 	cv::Mat displayMat = cv::Mat::ones(300, 701, CV_8UC3);
 	cv::Mat resultMat = neuralResult->getAvgResultMat();
 	
 	drawNeuralResultGraph(displayMat, resultMat, colors, frame);
-	drawLegend(displayMat, colors);
+	drawLegendWithValues(displayMat, neuralResult, frame, actions, colors);
 	imshow("Neural result", displayMat);
 }
 
-void showFrame(Action* action, NeuralResult* neuralResult, int frame, vector<cv::Scalar> colors)
+void showFrame(Action* action, NeuralResult* neuralResult, int frame, vector<DailyAction> actions, vector<cv::Scalar> colors)
 {
 	showRGB(action, frame);
 	showDepth(action, frame);
 	showRGBSkeleton(action, frame);
 	showDepthSkeleton(action, frame);
-	showNeuralOutput(neuralResult, frame,colors);
+	showNeuralOutput(neuralResult, frame, actions, colors);
 }
 
 void onTrackbar(int frame, void* data)
@@ -248,7 +267,7 @@ void onTrackbar(int frame, void* data)
 	showDepth(trackbarData->getAction() , frame);
 	showRGBSkeleton(trackbarData->getAction() , frame);
 	showDepthSkeleton(trackbarData->getAction() , frame);
-	showNeuralOutput(trackbarData->getNeuralResult(), frame, trackbarData->getColors());
+	showNeuralOutput(trackbarData->getNeuralResult(), frame, trackbarData->getActions(), trackbarData->getColors());
 
 	while (trackbarData->isVideoStopped())
 	{
@@ -272,10 +291,10 @@ void VideoManager::actionShowFrame(Action* action, NeuralResult* neuralResult, i
 		generateColors(colors, neuralResult->getAvgResultMat().cols);
 		colors.at(0) = cv::Scalar(255, 255, 255);
 
-		trackbarData = new TrackbarData(action, neuralResult, colors, frame, false);
+		trackbarData = new TrackbarData(action, neuralResult, actionList, colors, frame, false);
 	}
 	
-	showFrame(action, neuralResult, frame, colors);
+	showFrame(action, neuralResult, frame, actionList, colors);
 	updateTrackbar(trackbarData, action, neuralResult, frame);
 
 	cv::waitKey(60);
@@ -305,4 +324,6 @@ void VideoManager::setUpWindows(int frames)
 
 	windowsInitialized = true;
 }
+
+
 

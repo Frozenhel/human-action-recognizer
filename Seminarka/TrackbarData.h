@@ -8,12 +8,13 @@ class TrackbarData
 private:
 	Action * action;
 	NeuralResult* neuralResult;
+	vector<DailyAction> actions;
 	vector<cv::Scalar> colors;
 	int maxFrames;
 	bool videoStopped;
 
 public:
-	TrackbarData(Action * action, NeuralResult * neuralResult, vector<cv::Scalar> colors, int maxFrames, bool videoStopped);
+	TrackbarData(Action * action, NeuralResult * neuralResult, vector<DailyAction> actions, vector<cv::Scalar> colors, int maxFrames, bool videoStopped);
 
 	void update(Action* action, NeuralResult* neuralResult, int maxFrames);
 
@@ -25,6 +26,11 @@ public:
 	NeuralResult* getNeuralResult() const
 	{
 		return neuralResult;
+	}
+
+	vector<DailyAction> getActions() const
+	{
+		return actions;
 	}
 
 	vector<cv::Scalar> getColors() const
@@ -53,12 +59,13 @@ public:
 	}
 };
 
-inline TrackbarData::TrackbarData(Action* action, NeuralResult* neuralResult, vector<cv::Scalar> colors, int maxFrames, bool videoStopped)
+inline TrackbarData::TrackbarData(Action* action, NeuralResult* neuralResult, vector<DailyAction> actions, vector<cv::Scalar> colors, int maxFrames, bool videoStopped)
 {
 	this->action = action;
 	this->neuralResult = neuralResult;
 	this->maxFrames = maxFrames;
 	this->videoStopped = videoStopped;
+	this->actions = actions;
 	this->colors = colors;
 }
 

@@ -28,6 +28,7 @@ public:
 	void printResults() const;
 	void printNeuralValuesAtFrame(int frame) const;
 	void storeResultRow(CvMat * resultRow, cv::Mat classificator, int row);
+	void addValuesFromResult(NeuralResult * result);
 
 	cv::Mat getResultMat() const;
 	cv::Mat getAvgResultMat() const;
@@ -177,6 +178,14 @@ inline void NeuralResult::storeResultRow(CvMat * resultRow, cv::Mat classificato
 	checkResult(classificator, row);
 
 	printf("Testing Sample %i -> result AVG: %d, result nonAVG: %d \n", row, getLastAvgResult(), getLastResult());
+}
+
+inline void NeuralResult::addValuesFromResult(NeuralResult* result)
+{
+	correct += result->getNumOfCorrect();
+	wrong += result->getNumOfWrong();
+	correctAvg += result->getNumOfAvgCorrect();
+	wrongAvg += result->getNumOfAvgWrong();
 }
 
 inline cv::Mat NeuralResult::getResultMat() const

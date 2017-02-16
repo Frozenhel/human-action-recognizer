@@ -14,6 +14,9 @@
 #include <iomanip>
 #include <opencv2/opencv.hpp>
 
+#include "RecognizeMethod.h"
+#include "DailyActions.h"
+
 #include "Joint.h"
 #include "BodyPart.h"
 #include "Skeleton.h"

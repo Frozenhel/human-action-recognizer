@@ -5,13 +5,10 @@
 class DataLoader
 {
 private:
-	vector<int> actions;
-	string getFileName(int action, int human);
+	static string getFileName(int action, int human);
 public:
-	vector<Action*> loadDailyActivityDataset(vector<int> listOfActions, int numOfSamples);
+	static void loadDailyActivityDataset(vector<Action*>* actions);
 	vector<Action*> loadAction3DDataset(vector<int> listOfActions, int numOfSamples);
 
-	Action* loadDailyActivitySampleWithVideo(int action, int sample);
-
-	int getActionId(int action) const;
+	static void loadDailyActivitySampleWithVideo(Action * action);
 };
