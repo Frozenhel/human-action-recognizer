@@ -12,8 +12,8 @@ private:
 
 public:
 	DTWAnalyzer();
-	static float calcSimilarity(cv::Mat *T, cv::Mat *S, int z);
-	static float calcSimilarityCF(cv::Mat *T, cv::Mat *S, vector<int> * cf);
+	static float calcSimilarity(cv::Mat T, cv::Mat S);
+	static float calcSimilarityCF(cv::Mat T, cv::Mat S, vector<int> * cf);
 };
 
 inline float sqr(float x)
@@ -31,20 +31,20 @@ inline float minW(cv::Mat * W, int i, int j)
 	return min;
 }
 
-inline float DTWAnalyzer::calcSimilarity(cv::Mat *T, cv::Mat *S,int z)
+inline float DTWAnalyzer::calcSimilarity(cv::Mat T, cv::Mat S)
 {
-	cv::Mat W = cv::Mat(T->cols, S->cols, CV_32FC1, cv::Scalar(numeric_limits<float>::infinity()));
+	cv::Mat W = cv::Mat(T.cols, S.cols, CV_32FC1, cv::Scalar(numeric_limits<float>::infinity()));
 	float sum=0;
 	float distance;
-	for (int i = 0; i < T->cols; i++)
+	for (int i = 0; i < T.cols; i++)
 	{
-		for (int j = 0; j < S->cols; j++)
+		for (int j = 0; j < S.cols; j++)
 		{
 			sum = 0;
 			for (int k = 0; k < 136; k++)
 			{
-				float Ti = T->at<float>(k, i);
-				float Sj = S->at<float>(k, j);
+				float Ti = T.at<float>(k, i);
+				float Sj = S.at<float>(k, j);
 				sum += sqr(Ti - Sj);
 			}
 
@@ -74,8 +74,8 @@ inline float DTWAnalyzer::calcSimilarity(cv::Mat *T, cv::Mat *S,int z)
 		}
 	}
 
-	cv::imshow("img" + z, matUk);
-	cv::waitKey(1000);
+	//cv::imshow("img", matUk);
+	//cv::waitKey(1000);
 	
 	return W.at<float>(W.rows - 1, W.cols - 1);
 	cv::Mat dst;
@@ -104,22 +104,22 @@ inline float DTWAnalyzer::calcSimilarity(cv::Mat *T, cv::Mat *S,int z)
 }
 
 
-inline float DTWAnalyzer::calcSimilarityCF(cv::Mat *T, cv::Mat *S,vector<int> * cf)
+inline float DTWAnalyzer::calcSimilarityCF(cv::Mat T, cv::Mat S,vector<int> * cf)
 {
-	cv::Mat W = cv::Mat(T->cols, S->cols, CV_32FC1, cv::Scalar(numeric_limits<float>::infinity()));
+	cv::Mat W = cv::Mat(T.cols, S.cols, CV_32FC1, cv::Scalar(numeric_limits<float>::infinity()));
 	float sum = 0;
 	float distance;
 	int k;
-	for (int i = 0; i < T->cols; i++)
+	for (int i = 0; i < T.cols; i++)
 	{
-		for (int j = 0; j < S->cols; j++)
+		for (int j = 0; j < S.cols; j++)
 		{
 			sum = 0;
 			for (int z = 0; z < cf->size(); z++)
 			{
 				k = cf->at(z);
-				float Ti = T->at<float>(k, i);
-				float Sj = S->at<float>(k, j);
+				float Ti = T.at<float>(k, i);
+				float Sj = S.at<float>(k, j);
 				sum += sqr(Ti - Sj);
 			}
 
@@ -146,6 +146,91 @@ inline float DTWAnalyzer::calcSimilarityCF(cv::Mat *T, cv::Mat *S,vector<int> * 
 	//cout << "Podobnost2:   " << suma / (W.rows*W.cols) << "   suma:" << suma << " MxN " << W.rows * W.cols << " rows " << W.rows << "  max:" << max << endl;
 
 	return W.at<float>(W.rows - 1, W.cols - 1);
+
+}
+
+inline void calSimOrder(vector<float> similar, vector<float> * similarOrder)
+{
+	auto min = 10000000.f;
+	auto minPos = 0;
+	for (int i = 0; i < similar.size(); i++)
+	{
+		min = 10000000.f;
+		minPos = 0;
+		for (int j = 0; j < similar.size(); j++)
+		{
+			if (min > similar[j])
+			{
+				min = similar[j];
+				minPos = j;
+			}
+		}
+		similar.at(minPos) = 10000000;
+		similarOrder->push_back(minPos);
+	}
+}
+
+inline void testDTW(vector<Action*> trainedActions, vector<Action*> testActions)
+{
+	auto correctNonCf = new int[6]{0, 0, 0, 0, 0, 0};
+	auto correctCf = new int[6]{0, 0, 0, 0, 0, 0};
+
+	for (auto action : testActions)
+	{
+		vector<float> similar;
+		vector<float> similarCF;
+
+		float similarityMin = 5000000;
+		Action * similarAction = nullptr;
+		clock_t begin = clock();
+		for (auto storedAction : trainedActions){
+			if (DTWAnalyzer::calcSimilarity(action->getAnglesMatrix(), storedAction->getAnglesMatrix()) < similarityMin)
+				similarAction = storedAction;
+		}
+		clock_t end = clock();
+		cout << "NonCFTime " << double(end - begin) / CLOCKS_PER_SEC << " s" << endl;
+
+	/*	begin = clock();
+		for (auto storedAction : trainedActions){
+			similarCF.push_back(DTWAnalyzer::calcSimilarityCF(action->getAnglesMatrix(), storedAction->getAnglesMatrix()));
+		}
+
+		for (int i = 0; i < action_mats.size(); i++)
+		{
+			if (i == chosen) continue;
+			int cfRow = i / testRabits;
+			similarCF.push_back(DTWAnalyzer::calcSimilarityCF(&action_mats.at(i), &action_mats.at(chosen), &cf->getCFMat()[cfRow]));
+		}
+		end = clock();
+		cout << "CFTime " << double(end - begin) / CLOCKS_PER_SEC << " s" << endl;*/
+
+		//vector<float> similarOrder;
+//		vector<float> similarOrderCF;
+		//calSimOrder(similar, &similarOrder);
+	//	calSimOrder(similarCF, &similarOrderCF);
+
+		//cout << endl;
+	/*	cout << "CF  ";
+		for (int i = 0; i < 5; i++)
+		{
+			cout << similarOrderCF[i] << " ";
+		}
+		cout << endl;*/
+
+		cout << "Action " << action->getActionType() << " recognized as " << similarAction->getActionId() << endl;
+		if (action->getActionType() == similarAction->getActionId())
+			correctNonCf[action->getActionId()]++;
+
+	//	if (similarOrderCF[0] >= chosen - (chosen%testRabits) && similarOrderCF[0] < chosen + (testRabits - chosen%testRabits)) correctCf[chosen / 10]++;
+	}
+
+	cout << "Mira uspechu jednotlivych poznavani akci" << endl;
+	cout << "akce nonCF     CF" << endl;
+
+	for (auto i = 0; i < testActions.size(); i++)
+	{
+		cout << i << "    " << correctNonCf[i] << "/" << testActions.size() << "     " << correctCf[i] << "/" << testActions.size() << endl;
+	}
 
 }
 
